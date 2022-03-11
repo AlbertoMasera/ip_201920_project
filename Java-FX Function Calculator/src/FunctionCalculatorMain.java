@@ -1,0 +1,227 @@
+import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+
+public class FunctionCalculatorMain extends GridPane {
+
+	private ChoiceBox<String> function;
+	private Button calculate, report, clear;
+	private TextArea output;
+	private TextField input1, input2, input3, input4;
+	private Label instruction;
+	private static Stage stage2 = new Stage();
+
+	private static String history = "";
+	private static String[] names = { "Eratosthenes algorithm", " Euclid algorithm", "Number of prime numbers",
+			" Euler’s totient", "Factorizer", "Sigma function", "Linear congruential generator", "Partition counter" };
+
+	public FunctionCalculatorMain() {
+
+		Font font = new Font(20);
+
+		function = new ChoiceBox<String>();
+		function.getItems().addAll(names);
+		function.getSelectionModel().selectFirst();
+		function.setOnAction(this::processChoice);
+
+		instruction = new Label(
+				"The program will compute the Eratosthenes algorithm that compute all the prime numbers "
+						+ "smaller or equal than the input that is one integer number n greater than 1.");
+		instruction.setAlignment(Pos.CENTER);
+		instruction.setPrefWidth(550);
+		instruction.setWrapText(true);
+
+		input1 = new TextField();
+		input1.setPrefWidth(550);
+
+		input2 = new TextField();
+		input2.setPrefWidth(0);
+		input2.setManaged(false);
+
+		input3 = new TextField();
+		input3.setPrefWidth(130);
+		input3.setManaged(false);
+
+		input4 = new TextField();
+		input4.setPrefWidth(130);
+		input4.setManaged(false);
+
+		calculate = new Button("Calculate");
+		calculate.setFont(font);
+		calculate.setOnAction(this::processCalculate);
+		calculate.setMinSize(550, 20);
+
+		output = new TextArea("---");
+		output.setEditable(false);
+		output.setWrapText(true);
+
+		report = new Button("Report");
+		report.setOnAction(this::processReport);
+
+		clear = new Button("Clear");
+		clear.setOnAction(this::processClear);
+
+		HBox hbox = new HBox(input1, input2, input3, input4);
+		hbox.setAlignment(Pos.CENTER);
+		hbox.setSpacing(10);
+
+		HBox hbox1 = new HBox(report, clear);
+		hbox1.setAlignment(Pos.CENTER);
+		hbox1.setSpacing(445);
+
+		setAlignment(Pos.CENTER);
+		setHgap(20);
+		setVgap(10);
+		add(function, 0, 0);
+		add(instruction, 0, 1);
+		add(hbox, 0, 2);
+		add(calculate, 0, 3);
+		add(output, 0, 4);
+		add(hbox1, 0, 5);
+
+		getChildren().addAll();
+
+	}
+
+	public void processChoice(ActionEvent event) {
+		int a = function.getSelectionModel().getSelectedIndex();
+
+		input1.clear();
+		input2.clear();
+		input3.clear();
+		input4.clear();
+		output.setText("---");
+
+		input2.setVisible(false);
+		input3.setVisible(false);
+		input4.setVisible(false);
+
+		if (a == 6) {
+			input2.setManaged(true);
+			input3.setManaged(true);
+			input4.setManaged(true);
+			input2.setVisible(true);
+			input3.setVisible(true);
+			input4.setVisible(true);
+			input1.setPrefWidth(130);
+			input2.setPrefWidth(130);
+		} else {
+			if (a == 1 || a == 5) {
+				input2.setManaged(true);
+				input3.setManaged(false);
+				input4.setManaged(false);
+				input2.setVisible(true);
+				input3.setVisible(false);
+				input4.setVisible(false);
+				input1.setPrefWidth(270);
+				input2.setPrefWidth(270);
+			} else {
+				input2.setManaged(false);
+				input3.setManaged(false);
+				input4.setManaged(false);
+				input2.setVisible(false);
+				input3.setVisible(false);
+				input4.setVisible(false);
+				input1.setPrefWidth(550);
+			}
+		}
+
+		String inst = "";
+
+		switch (a) {
+
+		case 0:
+			inst = "The program will compute the Eratosthenes algorithm that compute all the prime numbers "
+					+ "smaller or equal than the input that is one integer number n greater than 1.";
+			break;
+		case 1:
+			inst = "Insert two integer n and m numbers greater than 0  and the program will compute the greatest "
+					+ "common divisor by using the Euclid algorithm.";
+			break;
+		case 2:
+			inst = "Insert an integer number n>0 and the program will compute the number of prime"
+					+ "numbers smaller or equal than n.";
+			break;
+		case 3:
+			inst = "Insert a positive integer number n and the program will compute the Euler’s totient "
+					+ "function, which is the number of positive integers that are coprime with n.";
+			break;
+		case 4:
+			inst = "Insert an integer number n>1 and the program will identify the prime factorization of the "
+					+ "number.            \n\n";
+			break;
+		case 5:
+			inst = "Insert two integer numbers x>=0 and n>1 compute the sigma(x, n) "
+					+ "function that sums the x-th powers of the positive divisors of n (including 1 and n "
+					+ "itself).";
+			break;
+		case 6:
+			inst = "Insert four integers a, b, m different from 0 and n and the program will compute the first n random "
+					+ "numbers (x1, …, xn) generated by the “linear congruential generator”. ";
+			break;
+		case 7:
+			inst = "Insert a non-negative integer n and the program will compute the partition function p(n) "
+					+ "of n, i.e., the number of possible partitions of n. ";
+			break;
+		}
+
+		instruction.setText(inst);
+	}
+
+	public void processCalculate(ActionEvent event) {
+
+		String outputString = FunctionsHandler.selectFunction(function.getSelectionModel().getSelectedIndex(),
+				input1.getText(), input2.getText(), input3.getText(), input4.getText());
+		history += "Computed: " + names[(function.getSelectionModel().getSelectedIndex())] + "\n" + outputString
+				+ "\n\n";
+		output.setText(outputString);
+
+	}
+
+	public void processClear(ActionEvent event) {
+
+		input1.clear();
+		input2.clear();
+		input3.clear();
+		input4.clear();
+
+		output.setText("---");
+
+	}
+
+	public void processReport(ActionEvent event) {
+
+		FunctionCalculatorReport result = new FunctionCalculatorReport();
+		result.setAlignment(Pos.CENTER);
+		result.setStyle("-fx-background-color: lightblue");
+
+		Scene scene2 = new Scene(result, 700, 350);
+
+		stage2.setTitle("Report");
+		stage2.setScene(scene2);
+		stage2.show();
+		stage2.setResizable(false);
+
+		if (!history.isEmpty())
+			FunctionCalculatorReport.getReport(history);
+
+	}
+
+	public static void clearHistory() {
+		history = "";
+	}
+
+	public static void exitReport() {
+		stage2.close();
+	}
+
+}
